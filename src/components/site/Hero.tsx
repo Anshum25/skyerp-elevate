@@ -178,26 +178,34 @@ export function Hero() {
 }
 
 function Particles() {
+  const [mounted, setMounted] = useState(false);
+  useEffect(() => setMounted(true), []);
+  const dots = useMemo(
+    () =>
+      Array.from({ length: 30 }).map(() => ({
+        x1: Math.random() * 100,
+        y1: Math.random() * 100,
+        y2: Math.random() * 100,
+        dur: 8 + Math.random() * 8,
+        delay: Math.random() * 4,
+      })),
+    [],
+  );
+  if (!mounted) return null;
   return (
     <div className="pointer-events-none absolute inset-0 overflow-hidden">
-      {Array.from({ length: 30 }).map((_, i) => (
+      {dots.map((d, i) => (
         <motion.span
           key={i}
           className="absolute h-1 w-1 rounded-full bg-white/40"
-          initial={{
-            x: `${Math.random() * 100}%`,
-            y: `${Math.random() * 100}%`,
-            opacity: 0.2,
-          }}
-          animate={{
-            y: [`${Math.random() * 100}%`, `${Math.random() * 100}%`],
-            opacity: [0.1, 0.6, 0.1],
-          }}
-          transition={{
-            duration: 8 + Math.random() * 8,
-            repeat: Infinity,
-            delay: Math.random() * 4,
-          }}
+          initial={{ x: `${d.x1}%`, y: `${d.y1}%`, opacity: 0.2 }}
+          animate={{ y: [`${d.y1}%`, `${d.y2}%`], opacity: [0.1, 0.6, 0.1] }}
+          transition={{ duration: d.dur, repeat: Infinity, delay: d.delay }}
+        />
+      ))}
+    </div>
+  );
+}
         />
       ))}
     </div>
