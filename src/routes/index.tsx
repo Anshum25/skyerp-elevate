@@ -1,24 +1,65 @@
 import { createFileRoute } from "@tanstack/react-router";
+import { Loader } from "@/components/site/Loader";
+import { SmoothScroll } from "@/components/site/SmoothScroll";
+import { ScrollProgress } from "@/components/site/ScrollProgress";
+import { Navbar } from "@/components/site/Navbar";
+import { Hero } from "@/components/site/Hero";
+import { Modules } from "@/components/site/Modules";
+import { WhySkyERP, AISection } from "@/components/site/WhyAndAI";
+import { Industries } from "@/components/site/Industries";
+import { Integrations } from "@/components/site/Integrations";
+import {
+  Testimonials,
+  ROICalculator,
+  Pricing,
+  FAQ,
+  CTASection,
+} from "@/components/site/Marketing";
+import { Footer } from "@/components/site/Footer";
+import {
+  ScrollToTop,
+  AIAssistantFAB,
+  CookieBanner,
+} from "@/components/site/Floaters";
 
-// No head() here: the home route inherits title/description/og/twitter from
-// __root.tsx, and ships no og:image so serve-time hosting can inject the
-// project's social preview (explicit og:image or latest screenshot).
 export const Route = createFileRoute("/")({
-  component: Index,
+  head: () => ({
+    meta: [
+      { title: "SkyERP — AI-native ERP for finance, ops, manufacturing & HR" },
+      {
+        name: "description",
+        content:
+          "One integrated ERP with SkyAI copilots. Finance, manufacturing, inventory, CRM, HR & projects on a single cloud platform. Trusted by 4,200+ global teams.",
+      },
+    ],
+  }),
+  component: Home,
 });
 
-// IMPORTANT: Replace this placeholder. See ./README.md for routing conventions.
-function Index() {
+function Home() {
   return (
-    <div
-      className="flex min-h-screen items-center justify-center"
-      style={{ backgroundColor: "#fcfbf8" }}
-    >
-      <img
-        data-lovable-blank-page-placeholder="REMOVE_THIS"
-        src="https://cdn.gpteng.co/blank-app-v1.svg"
-        alt="Your app will live here!"
-      />
-    </div>
+    <>
+      <Loader />
+      <SmoothScroll />
+      <ScrollProgress />
+      <Navbar />
+      <main>
+        <Hero />
+        <WhySkyERP />
+        <Modules />
+        <AISection />
+        <Industries />
+        <Integrations />
+        <Testimonials />
+        <ROICalculator />
+        <Pricing />
+        <FAQ />
+        <CTASection />
+      </main>
+      <Footer />
+      <ScrollToTop />
+      <AIAssistantFAB />
+      <CookieBanner />
+    </>
   );
 }
