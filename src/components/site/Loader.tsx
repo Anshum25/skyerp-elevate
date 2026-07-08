@@ -45,28 +45,19 @@ export function Loader() {
           aria-label="Loading SkyERP"
         >
           {/* Particles */}
-          <div className="absolute inset-0 overflow-hidden">
-            {Array.from({ length: 24 }).map((_, i) => (
-              <motion.span
-                key={i}
-                className="absolute h-1 w-1 rounded-full bg-sky-brand/60"
-                initial={{
-                  x: `${Math.random() * 100}%`,
-                  y: `${Math.random() * 100}%`,
-                  opacity: 0,
-                }}
-                animate={{
-                  y: [`${Math.random() * 100}%`, `${Math.random() * 100}%`],
-                  opacity: [0, 1, 0],
-                }}
-                transition={{
-                  duration: 3 + Math.random() * 4,
-                  repeat: Infinity,
-                  delay: Math.random() * 2,
-                }}
-              />
-            ))}
-          </div>
+          {mounted && (
+            <div className="absolute inset-0 overflow-hidden">
+              {particles.map((p, i) => (
+                <motion.span
+                  key={i}
+                  className="absolute h-1 w-1 rounded-full bg-sky-brand/60"
+                  initial={{ x: `${p.x1}%`, y: `${p.y1}%`, opacity: 0 }}
+                  animate={{ y: [`${p.y1}%`, `${p.y2}%`], opacity: [0, 1, 0] }}
+                  transition={{ duration: p.dur, repeat: Infinity, delay: p.delay }}
+                />
+              ))}
+            </div>
+          )}
 
           <div className="relative flex flex-col items-center gap-8">
             <motion.svg
