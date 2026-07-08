@@ -4,6 +4,19 @@ import { useEffect, useMemo, useState } from "react";
 export function Loader() {
   const [progress, setProgress] = useState(0);
   const [done, setDone] = useState(false);
+  const [mounted, setMounted] = useState(false);
+  const particles = useMemo(
+    () =>
+      Array.from({ length: 24 }).map(() => ({
+        x1: Math.random() * 100,
+        y1: Math.random() * 100,
+        y2: Math.random() * 100,
+        dur: 3 + Math.random() * 4,
+        delay: Math.random() * 2,
+      })),
+    [],
+  );
+  useEffect(() => setMounted(true), []);
 
   useEffect(() => {
     let raf: number;
