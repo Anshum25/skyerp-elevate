@@ -206,11 +206,6 @@ function Particles() {
     </div>
   );
 }
-        />
-      ))}
-    </div>
-  );
-}
 
 function HeroDashboard() {
   return (
