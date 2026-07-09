@@ -279,26 +279,73 @@ import { Stage, OrbitControls } from "@react-three/drei";
 
 function RotatingLogoModel() {
   const { scene } = useGLTF("/logo.glb");
-  const groupRef = useRef<THREE.Group>(null);
+  const controlsRef = useRef<any>(null);
+  const isDragging = useRef(false);
+  const resetTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const shouldReset = useRef(false);
 
   const clonedScene = useMemo(() => scene.clone(true), [scene]);
 
+  // Default polar angle (horizontal view = PI/2)
+  const defaultPolar = Math.PI / 2;
+
+  // Smoothly lerp the vertical angle back to default after user stops dragging
+  useFrame(() => {
+    if (shouldReset.current && controlsRef.current) {
+      const controls = controlsRef.current;
+      const currentPolar = controls.getPolarAngle();
+      const diff = Math.abs(currentPolar - defaultPolar);
+      
+      if (diff > 0.01) {
+        // Lerp toward default
+        const newPolar = currentPolar + (defaultPolar - currentPolar) * 0.05;
+        controls.minPolarAngle = newPolar;
+        controls.maxPolarAngle = newPolar;
+      } else {
+        // Close enough — snap and unlock
+        shouldReset.current = false;
+        controls.minPolarAngle = Math.PI / 6;
+        controls.maxPolarAngle = Math.PI - Math.PI / 6;
+      }
+    }
+  });
+
+  const handleStart = () => {
+    isDragging.current = true;
+    shouldReset.current = false;
+    if (resetTimer.current) clearTimeout(resetTimer.current);
+    // Unlock polar range so user can freely drag
+    if (controlsRef.current) {
+      controlsRef.current.minPolarAngle = Math.PI / 6;
+      controlsRef.current.maxPolarAngle = Math.PI - Math.PI / 6;
+    }
+  };
+
+  const handleEnd = () => {
+    isDragging.current = false;
+    // Start resetting after a short delay
+    resetTimer.current = setTimeout(() => {
+      shouldReset.current = true;
+    }, 300);
+  };
+
   return (
-    <group ref={groupRef}>
+    <>
       <Stage environment="city" intensity={1} adjustCamera={1.2}>
         <primitive object={clonedScene} />
       </Stage>
-      {/* 
-        OrbitControls autoRotate naturally pauses when the user grabs it, 
-        and seamlessly resumes rotating from the exact angle they leave it at.
-      */}
       <OrbitControls 
+        ref={controlsRef}
         autoRotate 
         autoRotateSpeed={1.5} 
         enableZoom={false} 
-        enablePan={false} 
+        enablePan={false}
+        minPolarAngle={Math.PI / 6}
+        maxPolarAngle={Math.PI - Math.PI / 6}
+        onStart={handleStart}
+        onEnd={handleEnd}
       />
-    </group>
+    </>
   );
 }
 
