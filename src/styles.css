@@ -258,6 +258,12 @@
   animation: float-slow 14s ease-in-out infinite;
 }
 
+/* Floating app icons around 3D logo */
+@keyframes float-app {
+  0%, 100% { transform: translateY(0px); }
+  50% { transform: translateY(-8px); }
+}
+
 /* Gradient shift */
 @keyframes gradient-shift {
   0%, 100% { background-position: 0% 50%; }

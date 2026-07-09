@@ -1,18 +1,31 @@
-import { motion, useMotionValue, useSpring, useTransform } from "framer-motion";
+import { motion, useMotionValue, useSpring, useTransform, AnimatePresence } from "framer-motion";
 import { useEffect, useMemo, useRef, useState, Suspense, Component, ReactNode } from "react";
 import { Canvas, useFrame } from "@react-three/fiber";
-import { useGLTF, Environment, Float, Center } from "@react-three/drei";
+import { useGLTF, Environment, Float, Center, Html, Stage, OrbitControls } from "@react-three/drei";
 import * as THREE from "three";
 import {
   ArrowRight,
   PlayCircle,
   Sparkles,
   TrendingUp,
-  Users,
-  ShoppingCart,
+  Box,
+  Filter,
+  Building2,
+  Wrench,
+  Calculator,
   Boxes,
-  BarChart3,
-  Bot,
+  Tag,
+  FileCheck,
+  Factory,
+  Presentation,
+  ShieldCheck,
+  ShoppingBag,
+  Package,
+  RefreshCw,
+  Settings,
+  UserRound,
+  Users,
+  Globe,
   CheckCircle2,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -275,16 +288,47 @@ export function Hero() {
 // Preload as early as possible so failures surface in the console right away
 useGLTF.preload("/logo.glb");
 
-import { Stage, OrbitControls } from "@react-three/drei";
-
-function RotatingLogoModel() {
+function RotatingLogoModel({ 
+  activeAppIndex, 
+  onAppHover,
+  onAppClick 
+}: { 
+  activeAppIndex: number; 
+  onAppHover: (index: number) => void;
+  onAppClick: (index: number) => void;
+}) {
   const { scene } = useGLTF("/logo.glb");
   const controlsRef = useRef<any>(null);
   const isDragging = useRef(false);
   const resetTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
   const shouldReset = useRef(false);
+  const orbitGroupRef = useRef<THREE.Group>(null);
 
   const clonedScene = useMemo(() => scene.clone(true), [scene]);
+
+  // Calculate Fibonacci sphere positions for the 10 apps
+  const sphericalPositions = useMemo(() => {
+    const numApps = floatingApps.length;
+    // The Golden Angle mathematically MUST use sqrt(5). Changing this breaks the sphere shape!
+    const phi = Math.PI * (3 - Math.sqrt(5)); 
+    return floatingApps.map((_, i) => {
+      const y = 1 - (i / (numApps - 1)) * 2; // y goes from 1 to -1
+      const radius = Math.sqrt(1 - y * y); // radius at y
+      const theta = phi * i; // golden angle increment
+      const x = Math.cos(theta) * radius;
+      const z = Math.sin(theta) * radius;
+      // Increased radius to 4.8 so the apps form a large globe completely outside the logo
+      return [x * 9.8, y * 9.8, z * 9.8] as [number, number, number];
+    });
+  }, []);
+
+  // Independent rotation for the holo-sphere (it orbits the logo)
+  useFrame((_, delta) => {
+    if (orbitGroupRef.current) {
+      orbitGroupRef.current.rotation.y -= delta * 0.3; // Rotate the sphere slowly
+      orbitGroupRef.current.rotation.x += delta * 0.1; // Add a slight tilt orbit
+    }
+  });
 
   // Default polar angle (horizontal view = PI/2)
   const defaultPolar = Math.PI / 2;
@@ -334,10 +378,60 @@ function RotatingLogoModel() {
       <Stage environment="city" intensity={1} adjustCamera={1.2}>
         <primitive object={clonedScene} />
       </Stage>
+      
+      {/* 3D Holo-Sphere App Orbit */}
+      <group ref={orbitGroupRef}>
+        {floatingApps.map((app, i) => {
+          const isActive = i === activeAppIndex;
+          const [x, y, z] = sphericalPositions[i];
+          return (
+            <Html
+              key={app.label}
+              position={[x, y, z]}
+              center
+              zIndexRange={[100, 0]}
+              className="pointer-events-auto"
+            >
+              <div 
+                className="relative flex items-center justify-center group cursor-pointer"
+                onClick={() => onAppClick(i)}
+                onPointerEnter={() => {
+                  document.body.style.cursor = 'pointer';
+                  onAppHover(i); // Pause auto-play and highlight this one
+                }}
+                onPointerLeave={() => {
+                  document.body.style.cursor = 'auto';
+                }}
+              >
+                {/* Large bare icon with drop shadow */}
+                <app.icon 
+                  className={cn(
+                    "transition-all duration-500",
+                    isActive ? "scale-150 drop-shadow-[0_0_20px_rgba(255,255,255,0.7)]" : "scale-100 opacity-80 drop-shadow-md hover:opacity-100 hover:scale-110"
+                  )} 
+                  style={{ color: app.color, width: '48px', height: '48px' }} 
+                />
+                
+                {/* Floating Tooltip strictly beside the icon */}
+                <div 
+                  className={cn(
+                    "absolute left-[130%] top-1/2 -translate-y-1/2 w-48 p-3 rounded-xl border border-foreground/10 bg-background/85 backdrop-blur-xl shadow-2xl transition-all duration-300 pointer-events-none z-50",
+                    isActive ? "opacity-100 translate-x-0" : "opacity-0 -translate-x-4"
+                  )}
+                >
+                  <h4 className="text-[13px] font-bold text-foreground mb-1 border-b border-foreground/10 pb-1">{app.label}</h4>
+                  <p className="text-[10px] leading-relaxed text-foreground/70">{app.description}</p>
+                </div>
+              </div>
+            </Html>
+          );
+        })}
+      </group>
+
       <OrbitControls 
         ref={controlsRef}
         autoRotate 
-        autoRotateSpeed={1.5} 
+        autoRotateSpeed={1.0} 
         enableZoom={false} 
         enablePan={false}
         minPolarAngle={Math.PI / 6}
@@ -398,14 +492,59 @@ class ModelErrorBoundary extends Component<
   }
 }
 
+// Floating app icons that orbit the 3D logo (Mapped to Frappe ecosystem)
+const floatingApps = [
+  { icon: Box, label: "Framework", color: "#64748b", description: "The underlying rapid application development architecture powering SkyERP." },
+  { icon: Filter, label: "Frappe CRM", color: "#d946ef", description: "Manage leads, opportunities, pipelines, and customer relationships in one place." },
+  { icon: Building2, label: "Organization", color: "#3b82f6", description: "Manage company structure, multiple branches, and complex multi-company setups." },
+  { icon: Wrench, label: "Tools", color: "#3b82f6", description: "Core system utilities, data import/export, and background job management." },
+  { icon: Calculator, label: "Accounting", color: "#0ea5e9", description: "General ledger, automated billing, invoicing, and real-time financial reporting." },
+  { icon: Boxes, label: "Assets", color: "#3b82f6", description: "Track fixed assets, calculate automated depreciation, and manage value lifecycles." },
+  { icon: Tag, label: "Buying", color: "#3b82f6", description: "Automate supplier management, purchase orders, and procure-to-pay processes." },
+  { icon: FileCheck, label: "India Compliance", color: "#0ea5e9", description: "Seamless GST integration, automated e-way bills, and strict local tax compliance." },
+  { icon: Factory, label: "Manufacturing", color: "#3b82f6", description: "Streamline production planning, bill of materials (BOM), and shop floor routing." },
+  { icon: Presentation, label: "Projects", color: "#3b82f6", description: "Track project tasks, employee timesheets, and overall project profitability." },
+  { icon: ShieldCheck, label: "Quality", color: "#3b82f6", description: "Enforce strict quality control standards, inspections, and compliance tracking." },
+  { icon: ShoppingBag, label: "Selling", color: "#3b82f6", description: "Omnichannel sales management from initial quotation to final order fulfillment." },
+  { icon: Package, label: "Stock", color: "#3b82f6", description: "Optimize inventory levels with AI forecasting and multi-warehouse management." },
+  { icon: RefreshCw, label: "Subcontracting", color: "#3b82f6", description: "Easily manage outsourced manufacturing processes and vendor materials." },
+  { icon: Settings, label: "ERPNext Settings", color: "#3b82f6", description: "Global core system configurations, permissions, and domain preferences." },
+  { icon: UserRound, label: "Frappe HR", color: "#10b981", description: "Manage the complete employee lifecycle, recruitment, and performance reviews." },
+  { icon: Users, label: "HRMS", color: "#10b981", description: "Automated payroll processing, shift attendance, and complex leave management." },
+  { icon: Globe, label: "Website", color: "#3b82f6", description: "Integrated web CMS, blogging, and seamless e-commerce portal generation." },
+];
+
 function RotatingLogo() {
-  // Defer canvas creation so the ShaderGradientCanvas has time to
-  // initialise its WebGL context first, avoiding context-limit races
   const [ready, setReady] = useState(false);
+  const [activeAppIndex, setActiveAppIndex] = useState(0);
+  const [isAutoPlaying, setIsAutoPlaying] = useState(true);
+
+  // Initialise WebGL
   useEffect(() => {
     const id = requestAnimationFrame(() => setReady(true));
     return () => cancelAnimationFrame(id);
   }, []);
+
+  // Auto-play interval sequence
+  useEffect(() => {
+    if (!isAutoPlaying) return;
+    
+    const interval = setInterval(() => {
+      setActiveAppIndex((prev) => (prev + 1) % floatingApps.length);
+    }, 2500); // 2.5 seconds per app gives enough time to read
+    
+    return () => clearInterval(interval);
+  }, [isAutoPlaying]);
+
+  const handleAppHover = (index: number) => {
+    setIsAutoPlaying(false);
+    setActiveAppIndex(index);
+  };
+
+  const handleAppClick = (index: number) => {
+    setIsAutoPlaying(false);
+    setActiveAppIndex(index);
+  };
 
   return (
     <motion.div
@@ -414,28 +553,56 @@ function RotatingLogo() {
       transition={{ duration: 0.8, delay: 0.2, ease: "easeOut" }}
       className="relative flex aspect-square w-full max-w-[600px] min-h-[400px] items-center justify-center mx-auto mt-10 lg:mt-0"
     >
-      <div className="absolute inset-0 z-10 rounded-3xl overflow-hidden">
-        {ready && (
-          <Canvas
-            camera={{ position: [0, 0, 6], fov: 45 }}
-            gl={{
-              powerPreference: "default",
-              alpha: true,
-              antialias: true,
-              preserveDrawingBuffer: true
-            }}
-          >
-            <ModelErrorBoundary>
-              <Suspense fallback={<ModelLoadingFallback />}>
-                <RotatingLogoModel />
-              </Suspense>
-            </ModelErrorBoundary>
-          </Canvas>
-        )}
+      {/* Orbit rings to suggest a sphere (visual only) */}
+      <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[75%] h-[75%] rounded-full border border-foreground/[0.04] pointer-events-none transform -rotate-45 scale-y-50 opacity-50" />
+      <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[95%] h-[95%] rounded-full border border-foreground/[0.03] pointer-events-none transform rotate-45 scale-y-50 opacity-50" />
+
+      {/* 3D Canvas in the center */}
+      <div className="absolute inset-0 z-10 rounded-full overflow-hidden pointer-events-none">
+        <div className="absolute inset-0 pointer-events-auto">
+          {ready && (
+            <Canvas
+              camera={{ position: [0, 0, 6.5], fov: 45 }}
+              gl={{
+                powerPreference: "default",
+                alpha: true,
+                antialias: true,
+                preserveDrawingBuffer: true
+              }}
+            >
+              <ModelErrorBoundary>
+                <Suspense fallback={<ModelLoadingFallback />}>
+                  <RotatingLogoModel 
+                    activeAppIndex={activeAppIndex} 
+                    onAppHover={handleAppHover}
+                    onAppClick={handleAppClick} 
+                  />
+                </Suspense>
+              </ModelErrorBoundary>
+            </Canvas>
+          )}
+        </div>
       </div>
 
       {/* Glow halo behind the 3D model */}
-      <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[70%] h-[70%] rounded-full bg-sky-brand/20 blur-[100px] pointer-events-none -z-10" />
+      <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[60%] h-[60%] rounded-full bg-sky-brand/15 blur-[80px] pointer-events-none -z-10" />
+
+      {/* Subtle particle dots */}
+      {Array.from({ length: 12 }).map((_, i) => {
+        const angle = (i / 12) * 2 * Math.PI;
+        const r = 30 + (i % 3) * 15;
+        return (
+          <div
+            key={`dot-${i}`}
+            className="absolute w-1 h-1 rounded-full bg-foreground/10 pointer-events-none"
+            style={{
+              left: `${50 + r * Math.cos(angle)}%`,
+              top: `${50 + r * Math.sin(angle)}%`,
+              animation: `float-app ${4 + (i % 4)}s ease-in-out ${i * 0.3}s infinite`,
+            }}
+          />
+        );
+      })}
     </motion.div>
   );
 }
