@@ -144,7 +144,11 @@ export function Hero() {
         <div className="absolute inset-0 bg-gradient-to-b from-background/40 via-background/10 to-background pointer-events-none" />
       </div>
 
-      <div className="relative mx-auto grid max-w-7xl gap-16 px-4 sm:px-6 lg:grid-cols-[1.05fr_1fr] lg:items-center">
+      <div 
+        className="relative grid gap-4 px-4 sm:px-6 lg:grid-cols-2 lg:gap-4 lg:items-center w-full"
+        style={{ maxWidth: '1650px', margin: '0 auto' }}
+      >
+
         <div>
           <motion.div
             initial={{ opacity: 0, y: 10 }}
@@ -271,22 +275,29 @@ export function Hero() {
 // Preload as early as possible so failures surface in the console right away
 useGLTF.preload("/logo.glb");
 
+import { Stage, OrbitControls } from "@react-three/drei";
+
 function RotatingLogoModel() {
   const { scene } = useGLTF("/logo.glb");
   const groupRef = useRef<THREE.Group>(null);
 
-  // Auto-rotate the model
-  useFrame((state, delta) => {
-    if (groupRef.current) {
-      groupRef.current.rotation.y += delta * 0.4;
-    }
-  });
+  const clonedScene = useMemo(() => scene.clone(true), [scene]);
 
   return (
     <group ref={groupRef}>
-      <Center>
-        <primitive object={scene} scale={5.5} />
-      </Center>
+      <Stage environment="city" intensity={1} adjustCamera={1.2}>
+        <primitive object={clonedScene} />
+      </Stage>
+      {/* 
+        OrbitControls autoRotate naturally pauses when the user grabs it, 
+        and seamlessly resumes rotating from the exact angle they leave it at.
+      */}
+      <OrbitControls 
+        autoRotate 
+        autoRotateSpeed={1.5} 
+        enableZoom={false} 
+        enablePan={false} 
+      />
     </group>
   );
 }
@@ -295,13 +306,13 @@ function RotatingLogoModel() {
 // instead of fallback={null} which hides load failures too
 function ModelLoadingFallback() {
   const meshRef = useRef<THREE.Mesh>(null);
-  useFrame((state, delta) => {
+  useFrame((_, delta) => {
     if (meshRef.current) meshRef.current.rotation.y += delta * 0.6;
   });
   return (
     <mesh ref={meshRef}>
       <torusKnotGeometry args={[0.9, 0.3, 100, 16]} />
-      <meshStandardMaterial color="#ff810a" wireframe opacity={0.5} transparent />
+      <meshStandardMaterial color="#375DFB" wireframe opacity={0.5} transparent />
     </mesh>
   );
 }
@@ -332,7 +343,7 @@ class ModelErrorBoundary extends Component<
       return (
         <mesh>
           <sphereGeometry args={[1, 32, 32]} />
-          <meshStandardMaterial color="#ff810a" wireframe />
+          <meshStandardMaterial color="#ef4444" wireframe />
         </mesh>
       );
     }
@@ -341,6 +352,14 @@ class ModelErrorBoundary extends Component<
 }
 
 function RotatingLogo() {
+  // Defer canvas creation so the ShaderGradientCanvas has time to
+  // initialise its WebGL context first, avoiding context-limit races
+  const [ready, setReady] = useState(false);
+  useEffect(() => {
+    const id = requestAnimationFrame(() => setReady(true));
+    return () => cancelAnimationFrame(id);
+  }, []);
+
   return (
     <motion.div
       initial={{ opacity: 0, scale: 0.95 }}
@@ -348,18 +367,24 @@ function RotatingLogo() {
       transition={{ duration: 0.8, delay: 0.2, ease: "easeOut" }}
       className="relative flex aspect-square w-full max-w-[600px] min-h-[400px] items-center justify-center mx-auto mt-10 lg:mt-0"
     >
-      <div className="absolute inset-0 z-10">
-        <Canvas camera={{ position: [0, 0, 6], fov: 45 }} gl={{ powerPreference: "high-performance", alpha: true }}>
-          <ambientLight intensity={0.8} />
-          <directionalLight position={[10, 10, 5]} intensity={2} />
-          <directionalLight position={[-10, -10, -5]} intensity={1} />
-          
-          <ModelErrorBoundary>
-            <Suspense fallback={<ModelLoadingFallback />}>
-              <RotatingLogoModel />
-            </Suspense>
-          </ModelErrorBoundary>
-        </Canvas>
+      <div className="absolute inset-0 z-10 rounded-3xl overflow-hidden">
+        {ready && (
+          <Canvas
+            camera={{ position: [0, 0, 6], fov: 45 }}
+            gl={{
+              powerPreference: "default",
+              alpha: true,
+              antialias: true,
+              preserveDrawingBuffer: true
+            }}
+          >
+            <ModelErrorBoundary>
+              <Suspense fallback={<ModelLoadingFallback />}>
+                <RotatingLogoModel />
+              </Suspense>
+            </ModelErrorBoundary>
+          </Canvas>
+        )}
       </div>
 
       {/* Glow halo behind the 3D model */}
