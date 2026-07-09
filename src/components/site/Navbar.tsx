@@ -26,10 +26,13 @@ import {
   FileText,
   Rocket,
   Phone,
+  Moon,
+  Sun,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 import { Logo } from "./Logo";
+import { useTheme } from "@/lib/theme";
 
 type MenuItem = {
   icon: React.ComponentType<{ className?: string }>;
@@ -88,6 +91,7 @@ export function Navbar() {
   const [scrolled, setScrolled] = useState(false);
   const [open, setOpen] = useState<string | null>(null);
   const [mobile, setMobile] = useState(false);
+  const { isDark, toggleTheme } = useTheme();
 
   useEffect(() => {
     const onScroll = () => setScrolled(window.scrollY > 24);
@@ -120,15 +124,12 @@ export function Navbar() {
             "flex items-center justify-between gap-4 rounded-2xl px-4 py-2.5 transition-all duration-500",
             scrolled
               ? "glass-dark shadow-elevated"
-              : "border border-white/10 bg-white/[0.03] backdrop-blur-md",
+              : "border border-foreground/10 bg-foreground/[0.03] backdrop-blur-md",
           )}
           onMouseLeave={() => setOpen(null)}
         >
-          <Link to="/" className="flex items-center gap-2 shrink-0">
-            <Logo className="h-8 w-8" />
-            <span className="font-display text-lg font-bold tracking-tight text-white">
-              Sky<span className="text-gradient-brand">ERP</span>
-            </span>
+          <Link to="/" className="flex items-center shrink-0">
+            <img src="/erpnextlogo.png" alt="SKY ERP" className="h-8 w-auto" />
           </Link>
 
           <div className="hidden items-center gap-1 lg:flex">
@@ -138,8 +139,8 @@ export function Navbar() {
                 onMouseEnter={() => setOpen(m.label)}
                 onFocus={() => setOpen(m.label)}
                 className={cn(
-                  "flex items-center gap-1 rounded-lg px-3 py-2 text-sm font-medium text-white/80 transition hover:bg-white/5 hover:text-white",
-                  open === m.label && "bg-white/5 text-white",
+                  "flex items-center gap-1 rounded-lg px-3 py-2 text-sm font-medium text-foreground/80 transition hover:bg-foreground/5 hover:text-foreground",
+                  open === m.label && "bg-foreground/5 text-foreground",
                 )}
                 aria-expanded={open === m.label}
                 aria-haspopup="true"
@@ -152,7 +153,7 @@ export function Navbar() {
               <Link
                 key={f.label}
                 to={f.to}
-                className="rounded-lg px-3 py-2 text-sm font-medium text-white/80 transition hover:bg-white/5 hover:text-white"
+                className="rounded-lg px-3 py-2 text-sm font-medium text-foreground/80 transition hover:bg-foreground/5 hover:text-foreground"
                 onMouseEnter={() => setOpen(null)}
               >
                 {f.label}
@@ -161,28 +162,44 @@ export function Navbar() {
           </div>
 
           <div className="hidden items-center gap-2 lg:flex">
+            <button
+              onClick={toggleTheme}
+              className="mr-2 rounded-full border border-foreground/10 bg-foreground/5 p-2 text-foreground/80 transition hover:bg-foreground/10 hover:text-foreground"
+              aria-label="Toggle theme"
+            >
+              {isDark ? <Sun className="h-4 w-4" /> : <Moon className="h-4 w-4" />}
+            </button>
             <Button
               variant="ghost"
-              className="text-white/80 hover:bg-white/10 hover:text-white"
+              className="text-foreground/80 hover:bg-foreground/10 hover:text-foreground"
               size="sm"
             >
               Login
             </Button>
             <Button
               size="sm"
-              className="gradient-ember shadow-ember text-white hover:opacity-95"
+              className="gradient-ember shadow-ember text-foreground hover:opacity-95"
             >
               Schedule Demo
             </Button>
           </div>
 
-          <button
-            onClick={() => setMobile((v) => !v)}
-            className="rounded-lg border border-white/10 bg-white/5 p-2 text-white lg:hidden"
-            aria-label={mobile ? "Close menu" : "Open menu"}
-          >
-            {mobile ? <X className="h-5 w-5" /> : <Menu className="h-5 w-5" />}
-          </button>
+          <div className="flex items-center gap-2 lg:hidden">
+            <button
+              onClick={toggleTheme}
+              className="rounded-lg border border-foreground/10 bg-foreground/5 p-2 text-foreground"
+              aria-label="Toggle theme"
+            >
+              {isDark ? <Sun className="h-4 w-4" /> : <Moon className="h-4 w-4" />}
+            </button>
+            <button
+              onClick={() => setMobile((v) => !v)}
+              className="rounded-lg border border-foreground/10 bg-foreground/5 p-2 text-foreground"
+              aria-label={mobile ? "Close menu" : "Open menu"}
+            >
+              {mobile ? <X className="h-5 w-5" /> : <Menu className="h-5 w-5" />}
+            </button>
+          </div>
 
           {/* Mega menu */}
           <AnimatePresence>
@@ -216,7 +233,7 @@ export function Navbar() {
             <div className="grid gap-1">
               {menus.map((m) => (
                 <details key={m.label} className="group rounded-lg">
-                  <summary className="flex cursor-pointer items-center justify-between px-3 py-2 text-sm font-medium text-white/90">
+                  <summary className="flex cursor-pointer items-center justify-between px-3 py-2 text-sm font-medium text-foreground/90">
                     {m.label}
                     <ChevronDown className="h-4 w-4 transition group-open:rotate-180" />
                   </summary>
@@ -225,12 +242,12 @@ export function Navbar() {
                       <a
                         key={it.title}
                         href="#"
-                        className="flex items-start gap-3 rounded-lg px-3 py-2 text-sm text-white/80 hover:bg-white/5"
+                        className="flex items-start gap-3 rounded-lg px-3 py-2 text-sm text-foreground/80 hover:bg-foreground/5"
                       >
                         <it.icon className="mt-0.5 h-4 w-4 text-sky-brand" />
                         <div>
-                          <div className="font-medium text-white">{it.title}</div>
-                          <div className="text-xs text-white/60">{it.desc}</div>
+                          <div className="font-medium text-foreground">{it.title}</div>
+                          <div className="text-xs text-foreground/60">{it.desc}</div>
                         </div>
                       </a>
                     ))}
@@ -241,16 +258,16 @@ export function Navbar() {
                 <Link
                   key={f.label}
                   to={f.to}
-                  className="rounded-lg px-3 py-2 text-sm font-medium text-white/90 hover:bg-white/5"
+                  className="rounded-lg px-3 py-2 text-sm font-medium text-foreground/90 hover:bg-foreground/5"
                 >
                   {f.label}
                 </Link>
               ))}
               <div className="mt-2 grid grid-cols-2 gap-2">
-                <Button variant="outline" className="border-white/20 bg-white/5 text-white hover:bg-white/10">
+                <Button variant="outline" className="border-foreground/20 bg-foreground/5 text-foreground hover:bg-foreground/10">
                   Login
                 </Button>
-                <Button className="gradient-ember text-white">
+                <Button className="gradient-ember text-foreground">
                   <Phone className="mr-1 h-4 w-4" /> Demo
                 </Button>
               </div>
@@ -272,14 +289,14 @@ function MegaGrid({ items, cols }: { items: MenuItem[]; cols: number }) {
           initial={{ opacity: 0, y: 6 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: i * 0.03 }}
-          className="group flex items-start gap-3 rounded-xl border border-transparent p-3 transition hover:border-sky-brand/30 hover:bg-white/5"
+          className="group flex items-start gap-3 rounded-xl border border-transparent p-3 transition hover:border-sky-brand/30 hover:bg-foreground/5"
         >
-          <div className="grid h-9 w-9 shrink-0 place-items-center rounded-lg gradient-brand text-white shadow-brand">
+          <div className="grid h-9 w-9 shrink-0 place-items-center rounded-lg gradient-brand text-foreground shadow-brand">
             <it.icon className="h-4.5 w-4.5" />
           </div>
           <div className="min-w-0">
-            <div className="text-sm font-semibold text-white">{it.title}</div>
-            <div className="text-xs text-white/60">{it.desc}</div>
+            <div className="text-sm font-semibold text-foreground">{it.title}</div>
+            <div className="text-xs text-foreground/60">{it.desc}</div>
           </div>
         </motion.a>
       ))}

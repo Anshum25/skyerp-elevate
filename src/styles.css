@@ -54,7 +54,7 @@
   --color-chart-4: var(--chart-4);
   --color-chart-5: var(--chart-5);
 
-  --font-display: "Space Grotesk", ui-sans-serif, system-ui, sans-serif;
+  --font-display: "Outfit", ui-sans-serif, system-ui, sans-serif;
   --font-sans: "Inter", ui-sans-serif, system-ui, sans-serif;
 }
 
@@ -162,9 +162,9 @@
 }
 
 @utility glass-dark {
-  background: color-mix(in oklab, var(--navy-2) 55%, transparent);
+  background: color-mix(in oklab, var(--background) 55%, transparent);
   backdrop-filter: blur(20px) saturate(160%);
-  border: 1px solid color-mix(in oklab, white 8%, transparent);
+  border: 1px solid color-mix(in oklab, var(--border) 40%, transparent);
 }
 
 @utility gradient-brand {

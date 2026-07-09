@@ -1,0 +1,345 @@
+// === 1. src/routes/index.tsx (Main Landing Page Layout) ===
+
+import { createFileRoute } from "@tanstack/react-router";
+import { LoadingScreen } from "@/components/site/loading-screen";
+import { AmbientBackground } from "@/components/site/background";
+import { SmoothScroll } from "@/lib/smooth-scroll";
+import { Navbar } from "@/components/site/navbar";
+import { Hero } from "@/components/site/hero";
+import { Industries } from "@/components/site/industries";
+import { Modules } from "@/components/site/modules";
+import { AIFeatures } from "@/components/site/ai-features";
+import { Integrations } from "@/components/site/integrations";
+import { Benefits } from "@/components/site/benefits";
+import { CaseStudies, Testimonials } from "@/components/site/social-proof";
+import { Process } from "@/components/site/process";
+import { Pricing } from "@/components/site/pricing";
+import { FAQ } from "@/components/site/faq";
+import { BlogAndEvents } from "@/components/site/blog-events";
+import { Partners, ContactCTA } from "@/components/site/contact";
+import { Footer } from "@/components/site/footer";
+
+export const Route = createFileRoute("/")({
+  component: Index,
+});
+
+function Index() {
+  return (
+    <SmoothScroll>
+      <LoadingScreen />
+      <AmbientBackground />
+      <Navbar />
+      <main>
+        <Hero />
+        <Industries />
+        <Modules />
+        <AIFeatures />
+        <Integrations />
+        <Benefits />
+        <CaseStudies />
+        <Process />
+        <Testimonials />
+        <Pricing />
+        <FAQ />
+        <BlogAndEvents />
+        <Partners />
+        <ContactCTA />
+      </main>
+      <Footer />
+    </SmoothScroll>
+  );
+}
+
+
+// === 2. src/components/site/hero.tsx (Hero Section with ShaderGradient and 3D Globe) ===
+
+import { useRef } from "react";
+import { motion } from "motion/react";
+import { Canvas, useFrame } from "@react-three/fiber";
+import * as THREE from "three";
+import {
+  Activity,
+  ArrowRight,
+  ShieldCheck,
+  Users,
+} from "lucide-react";
+import { Button } from "@/components/ui/button";
+import { fadeUp, staggerContainer } from "@/lib/motion";
+import { trustLogos } from "@/lib/site-data";
+import { ShaderGradientCanvas, ShaderGradient } from "@shadergradient/react";
+import { useTheme } from "@/lib/theme";
+
+// ── 3D Globe ─────────────────────────────────────────────────────────────────
+
+function GlobeInner() {
+  const coreRef = useRef<THREE.Mesh>(null);
+  const wire1Ref = useRef<THREE.Mesh>(null);
+  const wire2Ref = useRef<THREE.Mesh>(null);
+  const groupRef = useRef<THREE.Group>(null);
+
+  useFrame((state, delta) => {
+    const t = state.clock.getElapsedTime();
+    if (coreRef.current) coreRef.current.rotation.y += delta * 0.12;
+    if (wire1Ref.current) wire1Ref.current.rotation.y -= delta * 0.07;
+    if (wire1Ref.current) wire1Ref.current.rotation.x += delta * 0.03;
+    if (wire2Ref.current) wire2Ref.current.rotation.y += delta * 0.05;
+    if (wire2Ref.current) wire2Ref.current.rotation.z -= delta * 0.04;
+    if (groupRef.current) {
+      groupRef.current.rotation.y = t * 0.04;
+      groupRef.current.position.y = Math.sin(t * 0.5) * 0.08;
+    }
+  });
+
+  return (
+    <group ref={groupRef}>
+      {/* Solid core sphere */}
+      <mesh ref={coreRef}>
+        <sphereGeometry args={[1.5, 64, 64]} />
+        <meshStandardMaterial
+          color="#050914"
+          emissive="#0B5FFF"
+          emissiveIntensity={0.2}
+          roughness={0.35}
+          metalness={0.7}
+        />
+      </mesh>
+
+      {/* Outer wireframe ring 1 */}
+      <mesh ref={wire1Ref}>
+        <sphereGeometry args={[1.56, 28, 28]} />
+        <meshBasicMaterial color="#60A5FA" wireframe transparent opacity={0.25} />
+      </mesh>
+
+      {/* Outer wireframe ring 2 — tilted for depth */}
+      <mesh ref={wire2Ref} rotation={[Math.PI / 4, 0, Math.PI / 6]}>
+        <sphereGeometry args={[1.62, 20, 20]} />
+        <meshBasicMaterial color="#0B5FFF" wireframe transparent opacity={0.15} />
+      </mesh>
+
+      {/* Accent glow lights */}
+      <pointLight position={[2, 1.5, 2]} color="#60A5FA" intensity={3} distance={6} />
+      <pointLight position={[-2, -1, 1.5]} color="#0B5FFF" intensity={2} distance={5} />
+      <pointLight position={[0, 2, -2]} color="#93C5FD" intensity={1.5} distance={4} />
+    </group>
+  );
+}
+
+function Globe() {
+  return (
+    <div className="relative flex items-center justify-center">
+      <div className="relative z-10 h-[320px] w-[320px] sm:h-[400px] sm:w-[400px] md:h-[480px] md:w-[480px]">
+        <Canvas camera={{ position: [0, 0, 4.5], fov: 45 }}>
+          <ambientLight intensity={0.35} />
+          <directionalLight position={[5, 5, 5]} intensity={0.6} />
+          <GlobeInner />
+        </Canvas>
+      </div>
+      {/* Glow halo behind globe */}
+      <div className="absolute inset-0 rounded-full bg-accent/10 blur-[80px] -z-10 scale-75" />
+    </div>
+  );
+}
+
+// ── Hero ──────────────────────────────────────────────────────────────────────
+
+export function Hero() {
+  const { theme } = useTheme();
+  const isDark = theme === "dark";
+
+  return (
+    <section id="top" className="relative overflow-hidden pt-32 pb-16 sm:pt-40 sm:pb-24">
+      {/* Shader gradient background for both modes */}
+      <div className="absolute inset-0 -z-10">
+        <ShaderGradientCanvas style={{ width: "100%", height: "100%" }} pointerEvents="none">
+          {isDark ? (
+            <ShaderGradient
+              animate="on"
+              axesHelper="off"
+              brightness={1.2}
+              cAzimuthAngle={270}
+              cDistance={0.5}
+              cPolarAngle={180}
+              cameraZoom={15.1}
+              color1="#73bfc4"
+              color2="#ff810a"
+              color3="#0000f7"
+              destination="onCanvas"
+              embedMode="off"
+              envPreset="city"
+              format="gif"
+              fov={45}
+              frameRate={10}
+              gizmoHelper="hide"
+              grain="on"
+              lightType="env"
+              pixelDensity={1}
+              positionX={-0.1}
+              positionY={0}
+              positionZ={0}
+              range="disabled"
+              rangeEnd={40}
+              rangeStart={0}
+              reflection={0.3}
+              rotationX={0}
+              rotationY={130}
+              rotationZ={70}
+              shader="defaults"
+              type="sphere"
+              uAmplitude={3.2}
+              uDensity={0.8}
+              uFrequency={5.5}
+              uSpeed={0.3}
+              uStrength={0.3}
+              uTime={0}
+              wireframe={false}
+            />
+          ) : (
+            <ShaderGradient
+              animate="on"
+              axesHelper="off"
+              brightness={1.2}
+              cAzimuthAngle={270}
+              cDistance={0.5}
+              cPolarAngle={180}
+              cameraZoom={15.6}
+              color1="#ffda5e"
+              color2="#bfc1ff"
+              color3="#001df7"
+              destination="onCanvas"
+              embedMode="off"
+              envPreset="city"
+              format="gif"
+              fov={45}
+              frameRate={10}
+              gizmoHelper="hide"
+              grain="on"
+              lightType="3d"
+              pixelDensity={1}
+              positionX={-0.1}
+              positionY={0}
+              positionZ={0}
+              range="disabled"
+              rangeEnd={40}
+              rangeStart={0}
+              reflection={0.3}
+              rotationX={0}
+              rotationY={130}
+              rotationZ={70}
+              shader="defaults"
+              type="sphere"
+              uAmplitude={3.2}
+              uDensity={0.8}
+              uFrequency={5.5}
+              uSpeed={0.3}
+              uStrength={0.3}
+              uTime={0}
+              wireframe={false}
+            />
+          )}
+        </ShaderGradientCanvas>
+        <div className="absolute inset-0 bg-gradient-to-b from-background/40 via-background/10 to-background" />
+      </div>
+
+      <div className="mx-auto grid max-w-7xl items-center gap-12 px-4 lg:grid-cols-2">
+        {/* Left: Copy */}
+        <motion.div variants={staggerContainer(0.12)} initial="hidden" animate="show" className="max-w-2xl">
+          <motion.div variants={fadeUp}>
+            <span className="inline-flex items-center gap-2 rounded-full border border-border bg-accent-soft px-4 py-1.5 text-xs font-semibold text-accent">
+              <span className="h-1.5 w-1.5 rounded-full bg-accent" />
+              AI-native ERP for the modern enterprise
+            </span>
+          </motion.div>
+
+          <motion.h1
+            variants={fadeUp}
+            className="mt-6 text-balance font-display text-4xl font-semibold leading-[1.1] tracking-[-0.02em] sm:text-5xl lg:text-6xl text-foreground"
+          >
+            Run your entire business on{" "}
+            <span className="text-accent">one intelligent platform</span>.
+          </motion.h1>
+
+          <motion.p
+            variants={fadeUp}
+            className="mt-6 max-w-[560px] text-pretty text-base leading-relaxed text-muted sm:text-lg font-sans"
+          >
+            SkyERP unifies finance, supply chain, HR, manufacturing and CRM with
+            real-time analytics and an AI copilot — so global teams move faster,
+            decide smarter and scale without limits.
+          </motion.p>
+
+          <motion.div variants={fadeUp} className="mt-10 flex flex-wrap gap-4">
+            <Button
+              asChild
+              size="lg"
+              className="rounded-xl font-semibold bg-accent text-accent-foreground hover:bg-accent-hover transition-transform hover:scale-[1.02]"
+            >
+              <a href="#contact">
+                Schedule a Demo <ArrowRight className="ml-2 h-4 w-4" />
+              </a>
+            </Button>
+            <Button
+              asChild
+              size="lg"
+              variant="outline"
+              className="rounded-xl font-semibold border-border bg-background text-foreground hover:bg-background-alt"
+            >
+              <a href="#modules">Explore Platform</a>
+            </Button>
+          </motion.div>
+
+          <motion.div
+            variants={fadeUp}
+            className="mt-12 flex flex-wrap items-center gap-x-8 gap-y-4 text-xs text-muted"
+          >
+            <span className="flex items-center gap-2">
+              <ShieldCheck className="h-4 w-4 text-muted" />
+              <span className="font-sans">SOC 2 &amp; ISO 27001</span>
+            </span>
+            <span className="flex items-center gap-2">
+              <Activity className="h-4 w-4 text-muted" />
+              <span className="font-mono text-[11px] tracking-wider font-semibold">99.99%</span>
+              <span className="font-sans">uptime</span>
+            </span>
+            <span className="flex items-center gap-2">
+              <Users className="h-4 w-4 text-muted" />
+              <span className="font-mono text-[11px] tracking-wider font-semibold text-foreground">4,200+</span>
+              <span className="font-sans">enterprises</span>
+            </span>
+          </motion.div>
+        </motion.div>
+
+        {/* Right: 3D Globe */}
+        <motion.div
+          className="relative flex items-center justify-center"
+          initial={{ opacity: 0, scale: 0.9, y: 20 }}
+          animate={{ opacity: 1, scale: 1, y: 0 }}
+          transition={{ duration: 1, ease: [0.22, 1, 0.36, 1] }}
+        >
+          <Globe />
+        </motion.div>
+      </div>
+
+      {/* Trust logos row */}
+      <div className="mx-auto mt-16 max-w-7xl px-4 sm:mt-24">
+        <p className="text-center text-xs font-semibold uppercase tracking-[0.2em] text-muted">
+          Trusted by industry leaders worldwide
+        </p>
+        <div className="mt-6 grid grid-cols-2 gap-6 sm:grid-cols-3 lg:grid-cols-6">
+          {trustLogos.map((logo, i) => (
+            <motion.div
+              key={logo}
+              initial={{ opacity: 0, y: 10 }}
+              whileInView={{ opacity: 0.55, y: 0 }}
+              whileHover={{ opacity: 1 }}
+              viewport={{ once: true }}
+              transition={{ delay: i * 0.06 }}
+              className="text-center text-sm font-bold tracking-wider text-foreground/60 transition-opacity cursor-default"
+            >
+              {logo}
+            </motion.div>
+          ))}
+        </div>
+      </div>
+    </section>
+  );
+}

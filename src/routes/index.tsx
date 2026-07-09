@@ -16,11 +16,7 @@ import {
   CTASection,
 } from "@/components/site/Marketing";
 import { Footer } from "@/components/site/Footer";
-import {
-  ScrollToTop,
-  AIAssistantFAB,
-  CookieBanner,
-} from "@/components/site/Floaters";
+
 
 export const Route = createFileRoute("/")({
   head: () => ({
@@ -57,9 +53,7 @@ function Home() {
         <CTASection />
       </main>
       <Footer />
-      <ScrollToTop />
-      <AIAssistantFAB />
-      <CookieBanner />
+     
     </>
   );
 }
