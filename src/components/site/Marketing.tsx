@@ -276,75 +276,132 @@ export function FAQ() {
 }
 
 /* --- CTA + Contact --- */
+export function DemoContactCard({
+  className,
+  embedded = false,
+}: {
+  className?: string;
+  embedded?: boolean;
+}) {
+  return (
+    <div
+      className={cn(
+        "relative overflow-hidden p-8 sm:p-14",
+        embedded
+          ? "rounded-t-[2rem] rounded-b-none border-0 bg-card pb-8 shadow-none outline-none ring-0 sm:pb-10 dark:gradient-navy"
+          : "rounded-[2rem] border border-border bg-card shadow-elevated dark:border-transparent dark:gradient-navy",
+        className,
+      )}
+    >
+      <div className="pointer-events-none absolute inset-0 bg-mesh opacity-40 dark:opacity-70" />
+      <div className="pointer-events-none absolute -right-20 -top-20 h-72 w-72 rounded-full bg-ember/20 blur-3xl animate-float-slow" />
+
+      <div className="relative grid gap-10 lg:grid-cols-[1.1fr_1fr] lg:items-center">
+        <div>
+          <div className="inline-flex items-center gap-2 rounded-full border border-sky-brand/20 bg-sky-brand/5 px-3 py-1 text-xs font-semibold uppercase tracking-wider text-sky-brand dark:border-white/15 dark:bg-white/5 dark:text-white/80">
+            <Sparkles className="h-3.5 w-3.5 text-ember" /> Book a live demo
+          </div>
+          <h2 className="mt-5 font-display text-3xl font-bold leading-tight tracking-tight text-foreground sm:text-5xl dark:text-white">
+            Ready to modernize your enterprise{" "}
+            <span className="text-gradient-brand">on one platform?</span>
+          </h2>
+          <p className="mt-4 max-w-lg text-muted-foreground sm:text-lg dark:text-white/70">
+            See SkyERP tailored to your industry in a 30-minute walkthrough. No
+            slides. Real data, real workflows, real answers.
+          </p>
+          <ul className="mt-6 grid gap-2 text-sm text-muted-foreground sm:grid-cols-2 dark:text-white/70">
+            {[
+              "Personalized demo",
+              "Industry blueprint",
+              "ROI + migration plan",
+              "Reference customer intro",
+            ].map((x) => (
+              <li key={x} className="inline-flex items-center gap-2">
+                <Check className="h-4 w-4 text-mint" /> {x}
+              </li>
+            ))}
+          </ul>
+        </div>
+
+        <form
+          className="rounded-2xl border border-border bg-secondary/60 p-6 shadow-sm dark:glass-dark dark:shadow-elevated"
+          onSubmit={(e) => e.preventDefault()}
+        >
+          <div className="grid gap-3">
+            <div className="grid grid-cols-2 gap-3">
+              <div>
+                <Label className="text-xs text-muted-foreground dark:text-white/70">
+                  First name
+                </Label>
+                <Input
+                  required
+                  className="mt-1 dark:border-white/15 dark:bg-white/5 dark:text-white dark:placeholder:text-white/40"
+                  placeholder="Jane"
+                />
+              </div>
+              <div>
+                <Label className="text-xs text-muted-foreground dark:text-white/70">
+                  Last name
+                </Label>
+                <Input
+                  required
+                  className="mt-1 dark:border-white/15 dark:bg-white/5 dark:text-white dark:placeholder:text-white/40"
+                  placeholder="Doe"
+                />
+              </div>
+            </div>
+            <div>
+              <Label className="text-xs text-muted-foreground dark:text-white/70">
+                Work email
+              </Label>
+              <Input
+                required
+                type="email"
+                className="mt-1 dark:border-white/15 dark:bg-white/5 dark:text-white dark:placeholder:text-white/40"
+                placeholder="jane@company.com"
+              />
+            </div>
+            <div className="grid grid-cols-2 gap-3">
+              <div>
+                <Label className="text-xs text-muted-foreground dark:text-white/70">
+                  Company
+                </Label>
+                <Input
+                  required
+                  className="mt-1 dark:border-white/15 dark:bg-white/5 dark:text-white dark:placeholder:text-white/40"
+                  placeholder="ACME"
+                />
+              </div>
+              <div>
+                <Label className="text-xs text-muted-foreground dark:text-white/70">
+                  Employees
+                </Label>
+                <Input
+                  className="mt-1 dark:border-white/15 dark:bg-white/5 dark:text-white dark:placeholder:text-white/40"
+                  placeholder="100–500"
+                />
+              </div>
+            </div>
+            <Button
+              type="submit"
+              className="mt-2 h-11 w-full gradient-ember text-white shadow-ember"
+            >
+              Schedule my demo <ArrowRight className="ml-1 h-4 w-4" />
+            </Button>
+            <p className="text-center text-[11px] text-muted-foreground dark:text-white/50">
+              By submitting you agree to our privacy policy. No spam, ever.
+            </p>
+          </div>
+        </form>
+      </div>
+    </div>
+  );
+}
+
 export function CTASection() {
   return (
     <Section id="contact" className="overflow-hidden">
-      <div className="relative overflow-hidden rounded-[2rem] gradient-navy p-8 sm:p-14">
-        <div className="pointer-events-none absolute inset-0 bg-mesh opacity-70" />
-        <div className="pointer-events-none absolute inset-0 bg-grid-dark opacity-30 mask-fade-b" />
-        <div className="pointer-events-none absolute -right-20 -top-20 h-72 w-72 rounded-full bg-ember/20 blur-3xl animate-float-slow" />
-
-        <div className="relative grid gap-10 lg:grid-cols-[1.1fr_1fr] lg:items-center">
-          <div>
-            <div className="inline-flex items-center gap-2 rounded-full border border-white/15 bg-white/5 px-3 py-1 text-xs font-semibold uppercase tracking-wider text-white/80">
-              <Sparkles className="h-3.5 w-3.5 text-ember" /> Book a live demo
-            </div>
-            <h2 className="mt-5 font-display text-3xl font-bold leading-tight tracking-tight text-white sm:text-5xl">
-              Ready to modernize your enterprise{" "}
-              <span className="text-gradient-brand">on one platform?</span>
-            </h2>
-            <p className="mt-4 max-w-lg text-white/70 sm:text-lg">
-              See SkyERP tailored to your industry in a 30-minute walkthrough. No slides.
-              Real data, real workflows, real answers.
-            </p>
-            <ul className="mt-6 grid gap-2 text-sm text-white/70 sm:grid-cols-2">
-              {["Personalized demo", "Industry blueprint", "ROI + migration plan", "Reference customer intro"].map((x) => (
-                <li key={x} className="inline-flex items-center gap-2">
-                  <Check className="h-4 w-4 text-mint" /> {x}
-                </li>
-              ))}
-            </ul>
-          </div>
-
-          <form
-            className="rounded-2xl glass-dark p-6 shadow-elevated"
-            onSubmit={(e) => e.preventDefault()}
-          >
-            <div className="grid gap-3">
-              <div className="grid grid-cols-2 gap-3">
-                <div>
-                  <Label className="text-xs text-white/70">First name</Label>
-                  <Input required className="mt-1 border-white/15 bg-white/5 text-white placeholder:text-white/40" placeholder="Jane" />
-                </div>
-                <div>
-                  <Label className="text-xs text-white/70">Last name</Label>
-                  <Input required className="mt-1 border-white/15 bg-white/5 text-white placeholder:text-white/40" placeholder="Doe" />
-                </div>
-              </div>
-              <div>
-                <Label className="text-xs text-white/70">Work email</Label>
-                <Input required type="email" className="mt-1 border-white/15 bg-white/5 text-white placeholder:text-white/40" placeholder="jane@company.com" />
-              </div>
-              <div className="grid grid-cols-2 gap-3">
-                <div>
-                  <Label className="text-xs text-white/70">Company</Label>
-                  <Input required className="mt-1 border-white/15 bg-white/5 text-white placeholder:text-white/40" placeholder="ACME" />
-                </div>
-                <div>
-                  <Label className="text-xs text-white/70">Employees</Label>
-                  <Input className="mt-1 border-white/15 bg-white/5 text-white placeholder:text-white/40" placeholder="100–500" />
-                </div>
-              </div>
-              <Button type="submit" className="mt-2 h-11 w-full gradient-ember text-white shadow-ember">
-                Schedule my demo <ArrowRight className="ml-1 h-4 w-4" />
-              </Button>
-              <p className="text-center text-[11px] text-white/50">
-                By submitting you agree to our privacy policy. No spam, ever.
-              </p>
-            </div>
-          </form>
-        </div>
-      </div>
+      <DemoContactCard />
     </Section>
   );
 }

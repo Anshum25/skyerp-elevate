@@ -4,6 +4,7 @@ import { SmoothScroll } from "@/components/site/SmoothScroll";
 import { ScrollProgress } from "@/components/site/ScrollProgress";
 import { Navbar } from "@/components/site/Navbar";
 import { Hero } from "@/components/site/Hero";
+import { ScrollServices } from "@/components/site/ScrollServices";
 import { Modules } from "@/components/site/Modules";
 import { WhySkyERP, AISection } from "@/components/site/WhyAndAI";
 import { Industries } from "@/components/site/Industries";
@@ -13,8 +14,8 @@ import {
   ROICalculator,
   Pricing,
   FAQ,
-  CTASection,
 } from "@/components/site/Marketing";
+import { LetsWorkTransition } from "@/components/site/LetsWorkTransition";
 import { Footer } from "@/components/site/Footer";
 
 
@@ -41,6 +42,7 @@ function Home() {
       <Navbar />
       <main>
         <Hero />
+        <ScrollServices />
         <WhySkyERP />
         <Modules />
         <AISection />
@@ -50,7 +52,7 @@ function Home() {
         <ROICalculator />
         <Pricing />
         <FAQ />
-        <CTASection />
+        <LetsWorkTransition />
       </main>
       <Footer />
      
