@@ -1,52 +1,147 @@
-import { motion } from "framer-motion";
+import { motion, AnimatePresence } from "framer-motion";
 import { useState } from "react";
 import { Section, SectionHeader } from "./primitives";
-import { Star, Quote, ChevronDown, Check, ArrowRight, Calculator, Sparkles } from "lucide-react";
+import { Star, Quote, ChevronDown, Check, ArrowRight, ArrowLeft, Calculator, Sparkles } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { cn } from "@/lib/utils";
 
 /* --- Testimonials --- */
-const quotes = [
-  { name: "Aditi Rao", role: "CFO, Northwind Industries", quote: "SkyERP cut our monthly close from 12 days to 3. The AI copilot alone paid for itself in a quarter.", stars: 5 },
-  { name: "Marcus Chen", role: "COO, Globex Manufacturing", quote: "We replaced three legacy systems with SkyERP and doubled throughput without adding headcount.", stars: 5 },
-  { name: "Sara Ibrahim", role: "VP Ops, ACME Retail", quote: "Rolled out to 340 stores in 8 weeks. The mobile experience is unlike any ERP we've used.", stars: 5 },
-  { name: "David Park", role: "CIO, Stark Group", quote: "Finally, an ERP that our engineers, finance and shop floor actually enjoy using.", stars: 5 },
+const testimonials = [
+  {
+    company: "Northwind Industries",
+    name: "Aditi Rao",
+    role: "CFO",
+    quote: "SkyERP cut our monthly close from 12 days to 3. The AI copilot alone paid for itself in a quarter.",
+    image: "https://images.unsplash.com/photo-1556761175-5973dc0f32e7?ixlib=rb-4.0.3&auto=format&fit=crop&w=1600&q=80",
+    stats: [
+      { label: "Close Time", value: "75% faster" },
+      { label: "ROI", value: "< 3 months" }
+    ]
+  },
+  {
+    company: "Globex Manufacturing",
+    name: "Marcus Chen",
+    role: "COO",
+    quote: "We replaced three legacy systems with SkyERP and doubled throughput without adding headcount.",
+    image: "https://images.unsplash.com/photo-1581091226825-a6a2a5aee158?ixlib=rb-4.0.3&auto=format&fit=crop&w=1600&q=80",
+    stats: [
+      { label: "Throughput", value: "2x" },
+      { label: "Legacy systems replaced", value: "3" }
+    ]
+  },
+  {
+    company: "ACME Retail",
+    name: "Sara Ibrahim",
+    role: "VP Ops",
+    quote: "Rolled out to 340 stores in 8 weeks. The mobile experience is unlike any ERP we've used.",
+    image: "https://images.unsplash.com/photo-1522071820081-009f0129c71c?ixlib=rb-4.0.3&auto=format&fit=crop&w=1600&q=80",
+    stats: [
+      { label: "Stores", value: "340" },
+      { label: "Rollout", value: "8 weeks" }
+    ]
+  },
+  {
+    company: "Stark Group",
+    name: "David Park",
+    role: "CIO",
+    quote: "Finally, an ERP that our engineers, finance and shop floor actually enjoy using. The transition was seamless.",
+    image: "https://images.unsplash.com/photo-1542744173-8e7e53415bb0?ixlib=rb-4.0.3&auto=format&fit=crop&w=1600&q=80",
+    stats: [
+      { label: "User Adoption", value: "98%" },
+      { label: "Uptime", value: "99.99%" }
+    ]
+  }
 ];
 
 export function Testimonials() {
+  const [currentIndex, setCurrentIndex] = useState(0);
+
+  const next = () => setCurrentIndex((i) => (i + 1) % testimonials.length);
+  const prev = () => setCurrentIndex((i) => (i - 1 + testimonials.length) % testimonials.length);
+
   return (
-    <Section id="testimonials">
-      <SectionHeader
-        eyebrow="Loved by leaders"
-        title={<>What operators <span className="text-gradient-brand">say about SkyERP.</span></>}
-      />
-      <div className="mt-12 grid gap-5 md:grid-cols-2 lg:grid-cols-4">
-        {quotes.map((q, i) => (
-          <motion.figure
-            key={q.name}
-            initial={{ opacity: 0, y: 12 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true, margin: "-40px" }}
-            transition={{ delay: i * 0.05 }}
-            className="relative flex flex-col rounded-2xl border border-border bg-card p-6 shadow-sm transition hover:shadow-elevated"
-          >
-            <Quote className="h-6 w-6 text-sky-brand/60" />
-            <blockquote className="mt-3 flex-1 text-sm leading-relaxed text-foreground">
-              "{q.quote}"
-            </blockquote>
-            <div className="mt-4 flex items-center gap-1 text-ember">
-              {Array.from({ length: q.stars }).map((_, j) => (
-                <Star key={j} className="h-4 w-4 fill-current" />
-              ))}
-            </div>
-            <figcaption className="mt-3 border-t border-border pt-3">
-              <div className="text-sm font-semibold text-foreground">{q.name}</div>
-              <div className="text-xs text-muted-foreground">{q.role}</div>
-            </figcaption>
-          </motion.figure>
-        ))}
+    <Section id="testimonials" className="overflow-hidden" container={false}>
+      <div className="text-center mx-auto max-w-3xl mb-16 px-4 mt-20 sm:mt-28">
+        <div className="inline-flex items-center gap-2 rounded-full border border-sky-brand/20 bg-sky-brand/5 px-3 py-1 text-xs font-semibold uppercase tracking-wider text-sky-brand mb-6">
+          <Star className="h-3.5 w-3.5" /> Customer Success
+        </div>
+        <h2 className="font-display text-4xl font-bold tracking-tight sm:text-5xl md:text-6xl text-foreground">
+          Real results from <span className="text-gradient-brand">real companies</span>
+        </h2>
+        <p className="mt-6 text-muted-foreground sm:text-lg max-w-2xl mx-auto">
+          Discover how organizations across manufacturing, retail, and technology use SkyERP to transform their operations.
+        </p>
+      </div>
+
+      <div className="relative mx-auto w-full max-w-[1800px] overflow-hidden h-[600px] lg:h-[750px] flex items-center justify-center mb-20 sm:mb-28">
+        {testimonials.map((t, idx) => {
+          let diff = idx - currentIndex;
+          const len = testimonials.length;
+          
+          if (diff < -1) diff += len;
+          if (diff > 1) diff -= len;
+          
+          const isCenter = diff === 0;
+          const isPrev = diff === -1;
+          const isNext = diff === 1;
+          const isHidden = Math.abs(diff) > 1;
+
+          return (
+            <motion.div
+              key={t.name}
+              className="absolute w-[95%] lg:w-[1000px] xl:w-[1100px] h-[550px] lg:h-[650px]"
+              animate={{
+                x: isCenter ? '0%' : isPrev ? '-85%' : isNext ? '85%' : diff < 0 ? '-150%' : '150%',
+                scale: isCenter ? 1 : 0.85,
+                opacity: isCenter ? 1 : isHidden ? 0 : 0.4,
+                zIndex: isCenter ? 10 : 0,
+              }}
+              transition={{ duration: 0.6, ease: [0.32, 0.72, 0, 1] }}
+              onClick={() => {
+                if (isPrev) prev();
+                if (isNext) next();
+              }}
+              style={{ cursor: isCenter ? 'default' : 'pointer' }}
+            >
+              <div className="relative h-full w-full overflow-hidden rounded-[2.5rem] lg:rounded-[3rem] bg-secondary/30 border border-border shadow-elevated grid lg:grid-cols-2">
+                {/* Image side */}
+                <div className="relative h-64 lg:h-full overflow-hidden">
+                  <img 
+                      src={t.image} 
+                      alt={t.company} 
+                      className="absolute inset-0 h-full w-full object-cover" 
+                  />
+                </div>
+                
+                {/* Content side */}
+                <div className="flex flex-col justify-center p-8 sm:p-12 lg:p-16 bg-card/80 backdrop-blur-xl lg:border-l lg:border-border/50">
+                  <Quote className="h-10 w-10 lg:h-12 lg:w-12 text-sky-brand/40 mb-6 lg:mb-8 shrink-0" />
+                  <blockquote className="text-xl sm:text-2xl lg:text-3xl font-display font-medium leading-[1.3] text-foreground mb-8 lg:mb-10">
+                    "{t.quote}"
+                  </blockquote>
+                  
+                  <div className="mt-auto flex items-center justify-between">
+                    <div>
+                      <div className="font-bold text-lg lg:text-xl text-foreground">{t.name}</div>
+                      <div className="text-muted-foreground text-sm lg:text-base mt-1">{t.role}, {t.company}</div>
+                    </div>
+                  </div>
+                  
+                  <div className="mt-8 pt-8 lg:mt-10 lg:pt-8 border-t border-border grid grid-cols-2 gap-6 lg:gap-10">
+                    {t.stats.map((stat, i) => (
+                      <div key={i}>
+                        <div className="text-3xl md:text-4xl font-display font-bold text-sky-brand mb-1 lg:mb-2">{stat.value}</div>
+                        <div className="text-[10px] sm:text-xs md:text-sm text-muted-foreground uppercase tracking-widest font-semibold">{stat.label}</div>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              </div>
+            </motion.div>
+          );
+        })}
       </div>
     </Section>
   );
@@ -288,7 +383,7 @@ export function DemoContactCard({
       className={cn(
         "relative overflow-hidden p-8 sm:p-14",
         embedded
-          ? "rounded-t-[2rem] rounded-b-none border-0 bg-card pb-8 shadow-none outline-none ring-0 sm:pb-10 dark:gradient-navy"
+          ? "rounded-t-[2.5rem] sm:rounded-t-[3rem] rounded-b-none border-t border-border bg-white pb-12 shadow-[0_-10px_40px_rgba(0,0,0,0.12)] outline-none ring-0 sm:pb-16 dark:bg-slate-950"
           : "rounded-[2rem] border border-border bg-card shadow-elevated dark:border-transparent dark:gradient-navy",
         className,
       )}

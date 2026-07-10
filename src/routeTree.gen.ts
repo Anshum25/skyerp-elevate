@@ -9,8 +9,32 @@
 // Additionally, you should also exclude this file from your linter and/or formatter to prevent it from being checked or modified.
 
 import { Route as rootRouteImport } from './routes/__root'
+import { Route as ErpnextRouteImport } from './routes/erpnext'
+import { Route as DeliveryExcellenceRouteImport } from './routes/delivery-excellence'
+import { Route as CaseStudiesRouteImport } from './routes/case-studies'
+import { Route as AboutRouteImport } from './routes/about'
 import { Route as IndexRouteImport } from './routes/index'
 
+const ErpnextRoute = ErpnextRouteImport.update({
+  id: '/erpnext',
+  path: '/erpnext',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const DeliveryExcellenceRoute = DeliveryExcellenceRouteImport.update({
+  id: '/delivery-excellence',
+  path: '/delivery-excellence',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const CaseStudiesRoute = CaseStudiesRouteImport.update({
+  id: '/case-studies',
+  path: '/case-studies',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AboutRoute = AboutRouteImport.update({
+  id: '/about',
+  path: '/about',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const IndexRoute = IndexRouteImport.update({
   id: '/',
   path: '/',
@@ -19,28 +43,79 @@ const IndexRoute = IndexRouteImport.update({
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
+  '/about': typeof AboutRoute
+  '/case-studies': typeof CaseStudiesRoute
+  '/delivery-excellence': typeof DeliveryExcellenceRoute
+  '/erpnext': typeof ErpnextRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
+  '/about': typeof AboutRoute
+  '/case-studies': typeof CaseStudiesRoute
+  '/delivery-excellence': typeof DeliveryExcellenceRoute
+  '/erpnext': typeof ErpnextRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
+  '/about': typeof AboutRoute
+  '/case-studies': typeof CaseStudiesRoute
+  '/delivery-excellence': typeof DeliveryExcellenceRoute
+  '/erpnext': typeof ErpnextRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/'
+  fullPaths:
+    '/' | '/about' | '/case-studies' | '/delivery-excellence' | '/erpnext'
   fileRoutesByTo: FileRoutesByTo
-  to: '/'
-  id: '__root__' | '/'
+  to: '/' | '/about' | '/case-studies' | '/delivery-excellence' | '/erpnext'
+  id:
+    | '__root__'
+    | '/'
+    | '/about'
+    | '/case-studies'
+    | '/delivery-excellence'
+    | '/erpnext'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
+  AboutRoute: typeof AboutRoute
+  CaseStudiesRoute: typeof CaseStudiesRoute
+  DeliveryExcellenceRoute: typeof DeliveryExcellenceRoute
+  ErpnextRoute: typeof ErpnextRoute
 }
 
 declare module '@tanstack/react-router' {
   interface FileRoutesByPath {
+    '/erpnext': {
+      id: '/erpnext'
+      path: '/erpnext'
+      fullPath: '/erpnext'
+      preLoaderRoute: typeof ErpnextRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/delivery-excellence': {
+      id: '/delivery-excellence'
+      path: '/delivery-excellence'
+      fullPath: '/delivery-excellence'
+      preLoaderRoute: typeof DeliveryExcellenceRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/case-studies': {
+      id: '/case-studies'
+      path: '/case-studies'
+      fullPath: '/case-studies'
+      preLoaderRoute: typeof CaseStudiesRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/about': {
+      id: '/about'
+      path: '/about'
+      fullPath: '/about'
+      preLoaderRoute: typeof AboutRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/': {
       id: '/'
       path: '/'
@@ -53,6 +128,10 @@ declare module '@tanstack/react-router' {
 
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
+  AboutRoute: AboutRoute,
+  CaseStudiesRoute: CaseStudiesRoute,
+  DeliveryExcellenceRoute: DeliveryExcellenceRoute,
+  ErpnextRoute: ErpnextRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)

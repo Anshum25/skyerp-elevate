@@ -1,156 +1,75 @@
-import { useLayoutEffect, useRef } from "react";
-import gsap from "gsap";
-import { ScrollTrigger } from "gsap/ScrollTrigger";
+import { useRef } from "react";
+import { motion, useScroll, useTransform } from "framer-motion";
 import { DemoContactCard } from "./Marketing";
 
-gsap.registerPlugin(ScrollTrigger);
-
-const CIRCLE_SIZE = 200;
-
-function getCoverScale() {
-  const vw = window.innerWidth;
-  const vh = window.innerHeight;
-  const diagonal = Math.hypot(vw, vh);
-  return (diagonal / CIRCLE_SIZE) * 1.08;
-}
-
-function getTextScale() {
-  const vw = window.innerWidth;
-  if (vw < 640) return 2.8;
-  if (vw < 1024) return 3.6;
-  return 4.8;
-}
-
 export function LetsWorkTransition() {
-  const pinRef = useRef<HTMLDivElement>(null);
-  const circleRef = useRef<HTMLDivElement>(null);
-  const headlineRef = useRef<HTMLHeadingElement>(null);
-  const ctaRef = useRef<HTMLDivElement>(null);
-  const staticRef = useRef<HTMLDivElement>(null);
+  const containerRef = useRef<HTMLDivElement>(null);
+  
+  // Track the scroll progress of the 300vh container
+  const { scrollYProgress } = useScroll({
+    target: containerRef,
+    offset: ["start start", "end end"]
+  });
 
-  useLayoutEffect(() => {
-    const pin = pinRef.current;
-    const circle = circleRef.current;
-    const headline = headlineRef.current;
-    const cta = ctaRef.current;
-    const staticBlock = staticRef.current;
-    if (!pin || !circle || !headline || !cta || !staticBlock) return;
+  // Map scroll progress to animation values
+  // 0.0 -> 0.5: Expand circle, move text up
+  // 0.5 -> 0.9: Slide up the CTA form
+  
+  const circleScale = useTransform(scrollYProgress, [0, 0.5], [1, 40]);
+  const circleY = useTransform(scrollYProgress, [0, 0.5], ["-50%", "-60%"]);
+  
+  const headlineTop = useTransform(scrollYProgress, [0, 0.5], ["50%", "20%"]);
+  const headlineScale = useTransform(scrollYProgress, [0, 0.5], [1, 3.5]);
 
-    const mm = gsap.matchMedia();
-
-    mm.add(
-      {
-        isDesktop: "(min-width: 768px)",
-        reduceMotion: "(prefers-reduced-motion: reduce)",
-      },
-      (context) => {
-        const { isDesktop, reduceMotion } = context.conditions as {
-          isDesktop: boolean;
-          reduceMotion: boolean;
-        };
-
-        if (!isDesktop || reduceMotion) {
-          gsap.set(staticBlock, { display: "block" });
-          gsap.set(pin, { display: "none" });
-          return;
-        }
-
-        gsap.set(staticBlock, { display: "none" });
-        gsap.set(pin, { display: "block" });
-        gsap.set(cta, { yPercent: 100, opacity: 0 });
-        gsap.set(headline, { xPercent: -50, yPercent: -50, left: "50%", top: "50%" });
-
-        const tl = gsap.timeline({
-          scrollTrigger: {
-            trigger: pin,
-            start: "top top",
-            end: "+=280%",
-            scrub: 1,
-            pin: true,
-            anticipatePin: 1,
-            invalidateOnRefresh: true,
-          },
-        });
-
-        tl.fromTo(
-          circle,
-          { scale: 1 },
-          { scale: getCoverScale, ease: "none", duration: 0.62 },
-          0,
-        );
-
-        tl.fromTo(
-          headline,
-          { scale: 1, xPercent: -50, yPercent: -50, top: "50%" },
-          { scale: getTextScale, ease: "none", duration: 0.62 },
-          0,
-        );
-
-        tl.to(
-          headline,
-          {
-            top: "22%",
-            scale: getTextScale,
-            ease: "none",
-            duration: 0.18,
-          },
-          0.62,
-        );
-
-        tl.to(
-          circle,
-          {
-            scale: () => getCoverScale() * 0.92,
-            y: "-8%",
-            ease: "none",
-            duration: 0.18,
-          },
-          0.62,
-        );
-
-        tl.fromTo(
-          cta,
-          { yPercent: 100, opacity: 0 },
-          { yPercent: 0, opacity: 1, ease: "none", duration: 0.2 },
-          0.72,
-        );
-
-        return () => tl.scrollTrigger?.kill();
-      },
-    );
-
-    return () => mm.revert();
-  }, []);
+  const ctaY = useTransform(scrollYProgress, [0.4, 0.85], [800, 0]);
+  const ctaOpacity = useTransform(scrollYProgress, [0.4, 0.85], [0, 1]);
 
   return (
     <section id="contact" className="relative">
-      {/* Pinned scroll animation — desktop only */}
-      <div
-        ref={pinRef}
-        className="relative hidden h-screen w-full overflow-hidden bg-background md:block"
+      {/* Desktop (Sticky Animation) */}
+      <div 
+        ref={containerRef}
+        className="relative hidden md:block h-[300vh] w-full bg-background"
       >
-        <div
-          ref={circleRef}
-          className="absolute left-1/2 top-1/2 z-10 h-[200px] w-[200px] -translate-x-1/2 -translate-y-1/2 origin-center rounded-full gradient-ember shadow-ember"
-        />
+        <div className="sticky top-0 h-screen w-full overflow-hidden">
+          {/* Expanding Circle */}
+          <motion.div
+            style={{ 
+              scale: circleScale, 
+              y: circleY,
+              x: "-50%" 
+            }}
+            className="absolute left-1/2 top-1/2 z-10 h-[200px] w-[200px] origin-center rounded-full gradient-ember shadow-ember"
+          />
 
-        <h2
-          ref={headlineRef}
-          className="absolute left-1/2 z-20 whitespace-nowrap font-display text-base font-bold uppercase tracking-[0.24em] text-white sm:text-lg"
-        >
-          Let&apos;s work
-        </h2>
+          {/* Headline Text */}
+          <motion.h2
+            style={{ 
+              top: headlineTop, 
+              scale: headlineScale, 
+              y: "-50%", 
+              x: "-50%" 
+            }}
+            className="absolute left-1/2 z-20 whitespace-nowrap font-display text-base font-bold uppercase tracking-[0.24em] text-white sm:text-lg"
+          >
+            Let&apos;s work
+          </motion.h2>
 
-        <div
-          ref={ctaRef}
-          className="absolute inset-x-0 bottom-0 z-30 mx-auto w-full max-w-7xl px-4 sm:px-6"
-        >
-          <DemoContactCard embedded />
+          {/* Contact Card */}
+          <motion.div
+            style={{ 
+              y: ctaY, 
+              opacity: ctaOpacity 
+            }}
+            className="absolute inset-x-0 bottom-0 z-30 mx-auto w-full max-w-7xl px-4 sm:px-6"
+          >
+            <DemoContactCard embedded />
+          </motion.div>
         </div>
       </div>
 
-      {/* Static fallback — mobile & reduced motion */}
-      <div ref={staticRef} className="bg-background py-20 sm:py-28 md:hidden">
+      {/* Mobile (Static Fallback) */}
+      <div className="bg-background py-20 sm:py-28 md:hidden">
         <div className="mx-auto max-w-7xl px-4 sm:px-6">
           <div className="mb-10 text-center">
             <div className="mx-auto mb-6 flex h-28 w-28 items-center justify-center rounded-full gradient-ember shadow-ember sm:h-32 sm:w-32">

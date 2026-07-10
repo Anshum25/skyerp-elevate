@@ -35,10 +35,14 @@ export function ScrollServices() {
       const pin = pinRef.current;
       if (!track || !pin) return;
 
-      const getDistance = () => track.scrollWidth - window.innerWidth;
+      const getDistance = () => {
+        if (!track) return 0;
+        // With the parent as flex-col, track.scrollWidth is 100% accurate instantly
+        // because the browser doesn't try to shrink it as a row flex item.
+        return track.scrollWidth - window.innerWidth;
+      };
+
       // Extra vertical scroll room beyond the raw horizontal distance, so the
-      // ride feels slower and every card gets time on screen instead of
-      // whipping past in a couple of wheel ticks.
       const SCROLL_LENGTH_MULTIPLIER = 2;
 
       const tween = gsap.to(track, {
@@ -48,7 +52,7 @@ export function ScrollServices() {
           trigger: pin,
           start: "top top",
           end: () => `+=${getDistance() * SCROLL_LENGTH_MULTIPLIER}`,
-          scrub: 1,
+          scrub: 0.5,
           pin: true,
           anticipatePin: 1,
           invalidateOnRefresh: true,
@@ -73,16 +77,16 @@ export function ScrollServices() {
 
       <div
         ref={pinRef}
-        className="relative md:flex md:h-screen md:items-center md:overflow-hidden"
+        className="relative md:flex md:h-screen md:flex-col md:justify-center md:overflow-hidden"
       >
         <div
           ref={trackRef}
-          className="flex snap-x snap-mandatory gap-6 overflow-x-auto px-4 pb-6 [scrollbar-width:none] sm:px-6 md:snap-none md:overflow-visible md:px-0 md:pb-0 [&::-webkit-scrollbar]:hidden"
+          className="flex snap-x snap-mandatory gap-6 overflow-x-auto px-[5vw] pb-6 [scrollbar-width:none] md:snap-none md:overflow-visible md:px-[10vw] lg:px-[12.5vw] xl:px-[15vw] md:pb-0 [&::-webkit-scrollbar]:hidden w-full"
         >
           {services.map((s) => (
             <div
               key={s.n}
-              className="group relative flex h-[70vh] w-[90vw] shrink-0 snap-start flex-col justify-between rounded-[2rem] border border-border bg-card p-10 shadow-elevated sm:h-[75vh] sm:p-14 md:h-[560px] md:w-[62vw] lg:w-[52vw] xl:w-[44vw]"
+              className="group relative flex h-[75vh] w-[90vw] shrink-0 snap-start flex-col justify-between rounded-[2rem] border border-border bg-card p-10 shadow-elevated sm:h-[80vh] sm:p-14 md:h-[70vh] md:w-[80vw] lg:w-[75vw] xl:w-[70vw]"
             >
               <div className="flex items-start justify-between">
                 <div className="grid h-20 w-20 place-items-center rounded-3xl bg-sky-brand/10 text-sky-brand transition group-hover:gradient-brand group-hover:text-white sm:h-24 sm:w-24">
