@@ -1,41 +1,58 @@
-import { motion } from "framer-motion";
+import {
+  BadgeCheck,
+  Box,
+  Building2,
+  Calculator,
+  Factory,
+  Filter,
+  Kanban,
+  Layers,
+  Package,
+  RefreshCw,
+  Settings,
+  ShieldCheck,
+  ShoppingBag,
+  Store,
+  UserCircle,
+  Users,
+  Wrench,
+} from "lucide-react";
 import { Section, SectionHeader } from "./primitives";
+import { GravityPills, type StackPill } from "./GravityPills";
 
-const integrations = [
-  "WhatsApp", "Microsoft 365", "Google Workspace", "Power BI",
-  "Razorpay", "Stripe", "Shopify", "WooCommerce",
-  "Slack", "Microsoft Teams", "Zoom", "Gmail",
-  "Outlook", "APIs", "Webhooks", "Salesforce",
+const stackModules: StackPill[] = [
+  { name: "Framework", icon: Box, accent: "sky" },
+  { name: "Frappe CRM", icon: Filter, accent: "ember" },
+  { name: "Organization", icon: Building2, accent: "sky" },
+  { name: "Tools", icon: Wrench, accent: "sky" },
+  { name: "Accounting", icon: Calculator, accent: "sky" },
+  { name: "Assets", icon: Layers, accent: "sky" },
+  { name: "Buying", icon: ShoppingBag, accent: "sky" },
+  { name: "India Compliance", icon: ShieldCheck, accent: "sky" },
+  { name: "Manufacturing", icon: Factory, accent: "sky" },
+  { name: "Projects", icon: Kanban, accent: "sky" },
+  { name: "Quality", icon: BadgeCheck, accent: "sky" },
+  { name: "Selling", icon: Store, accent: "sky" },
+  { name: "Stock", icon: Package, accent: "sky" },
+  { name: "Subcontracting", icon: RefreshCw, accent: "sky" },
+  { name: "ERPNext Settings", icon: Settings, accent: "sky" },
+  { name: "Frappe HR", icon: UserCircle, accent: "mint" },
+  { name: "HRMS", icon: Users, accent: "mint" },
 ];
 
 export function Integrations() {
   return (
     <Section id="integrations" className="bg-secondary/40">
       <SectionHeader
-        eyebrow="Integrations"
-        title={<>Fits your <span className="text-gradient-brand">tech stack.</span></>}
-        description="Prebuilt connectors for the tools your teams already use — plus open APIs and webhooks for anything else."
+        eyebrow="Platform"
+        title={
+          <>
+            Fits your <span className="text-gradient-brand">tech stack.</span>
+          </>
+        }
+        description="Every module you need — accounting, manufacturing, HR, and more — unified on one platform."
       />
-      <div className="mt-12 grid grid-cols-2 gap-3 sm:grid-cols-4 lg:grid-cols-8">
-        {integrations.map((name, i) => (
-          <motion.div
-            key={name}
-            initial={{ opacity: 0, scale: 0.95 }}
-            whileInView={{ opacity: 1, scale: 1 }}
-            viewport={{ once: true, margin: "-40px" }}
-            transition={{ delay: (i % 8) * 0.04, duration: 0.35 }}
-            whileHover={{ y: -3, scale: 1.03 }}
-            className="group relative aspect-square rounded-2xl border border-border bg-card p-3 transition hover:border-sky-brand/40 hover:shadow-elevated"
-          >
-            <div className="flex h-full flex-col items-center justify-center gap-2 text-center">
-              <div className="grid h-10 w-10 place-items-center rounded-xl bg-gradient-to-br from-sky-brand/20 to-ember/20 text-sm font-bold text-foreground">
-                {name.slice(0, 2)}
-              </div>
-              <div className="text-xs font-medium text-foreground">{name}</div>
-            </div>
-          </motion.div>
-        ))}
-      </div>
+      <GravityPills modules={stackModules} />
     </Section>
   );
 }
